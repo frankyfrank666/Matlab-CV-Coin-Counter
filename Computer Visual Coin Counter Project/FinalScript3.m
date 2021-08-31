@@ -8,9 +8,15 @@ filtsize = 85;
 % 'coins.png' contains bright nickels and dimes on a dark background
 % 'eight.tif' contains dark quarters on a bright background, so we invert it
 % to match 'coins.png'
+
+% load im1 and im2 data directly if you have no access to Img processing toolbox thus the coin picture examples
+load im1
+load im2
+
 im1 = imread('coins.png');
-[r,c] = size(im1);
 im2 = imread('eight.tif');
+
+[r,c] = size(im1);
 [r2,c2] = size(im2);
 filtsizeh = floor(filtsize/2);
 im = zeros(r+r2+filtsize,c+filtsize);
