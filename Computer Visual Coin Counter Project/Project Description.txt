@@ -1,0 +1,52 @@
+PROJECT MATLAB COIN IMAGE ANALYSIS
+
+
+Your task in step 1 is to segment the coins from the background in the image and find the centroid of each distinct segmented coin
+
+Otsu threshold the image to create in initial, but noisy segmentation. Use your 'OtsuThreshold' function we created in the class. Embed it in the Helper Functions list at the bottom of the script. Store the result in msk.
+
+Filter the mask to fill all the holes and remove all the false positives. One option is to perform a dilation operation on msk to fill in false negative holes in the initial
+segmentation. You need to choose a structuring element just large enough to fill in all the holes. If you store the result in msk_dil, it will be displayed. Then, you can perform an erosion operation on msk_dil to separate the coins that were joined together by dilation so that a distinct centroid can be found for each coin in the next step. Here, you would choose a structuring element large enough to disconnect each coin. Storing the result in msk_dil_erd will display it.
+
+Use the built-in function regionprops to find the centroid of each coin as the centroid of each connected component in your filtered image. Store the result, rounded to the
+closest integer, in [Nx2] matrix centroid, where N is the number of components and the columns contain the x-y coordinates for each centroid. Also record the area (total
+number of pixels) of each component in [Nx1] vector component_size.
+
+It is recommended that you write the code in chronological order and run the script each time you create a new assessed or displayed variable. For example, run your script after
+creating msk, and you will see your initial thresholding result displayed in a figure. All assessed variables have been initialized as empty so that your code will execute without errors while you are developing your script
+
+
+Step 2. Measure features for each coin using a so-called "filter bank" of matching filters.
+
+In step 1 we found the coins, but we still need to classify them. In step 3 we will perform classifcation. The classifier needs feature measurements for each coin, which we will collect in this step. A "filter bank" of matching filters can be constructed, with distinct filters for quarters, nickels, and dimes. We can apply each of the 3 filters in the filter bank to a coin in msk_dil_erd, the results of which generate 3 features that can be used by k-means. in the next step.
+
+In a separate MATLAB grader problem, you are asked to create function MakeCircleMatchingFilter. Complete that problem now and return to this script when
+finished. Embed the resulting function in the bottom of the script with the other Helper Functions
+
+Use the MakeCircleMatchingFilter function with the default variables provided in the script to create the dime, nickel, and quarter matching filters, dimefilter,
+nickelfilter, and quarterfilter.
+
+For each ith coin centroid found in step 1, compute the jth (j=1, 2, and 3 should correspond to the dime, nickel, and quarter filters, respectively) matching filter result by computing the correlation between the matching filter and the local region of image pixels that fall within filtsizeh (half the matching filter width) rows and columns to the centroid. Store the result in D(i,j).
+
+
+Step 3. Perform k-means clustering of features for an unsupervised learning coin-type classifier and visualize the results
+
+Apply the k-means algorithm with k=3 on feature matrix D to obtain classification cls_init. Make sure rng(0) is called prior to running k-means as otherwise you may get a
+different result since k-means uses random numbers in its optimization. Clustering should result in distinct classification of the nickels, dimes, and quarters.
+
+Map the labels assigned by k-means to each class to a numeric label for each coin of 1, 2, and 3 for dimes, nickels, and quarters, respectively. To do this, first compute and
+store the average area of the components in each of the 3 classes in the [3x1] vector class_ave_object_size (the size of each component regardless of class is already
+stored in component_size). The class corresponding to dimes should have the smallest average size, nickels the next smallest, and quarters the largest. To map the
+labels in cls_init to [1,2,3] for smallest to largest coin ordering, find the sorting indices classmap needed to sort class_ave_object_size as the second output of the sort
+function. classmap(1) contains the label of the smallest (dime) class, classmap(2) the middle (nickel) class, and classmap(3) the largest (quarter) class. Finally, define the
+[Nx1] classification vector cls such that cls(i) equals 1 if cls_init(i) equals classmap(1), cls(i) equals 2 if cls_init(i) equals classmap(2), and cls(i) equals 3 if cls_init(i)
+equals classmap(3). This converts the k-means labels in cls_init to be [1,2,3] for dimes, nickels, and quarters in cls. We now have our classifications. Next, let's visualize
+the results in a way that we can easily see if they are correct.
+
+In a separate MATLAB grader problem, you are asked to create function AddCoinToPlotAndCount. Complete that problem now and return to this script when
+finished. Embed the resulting function in the bottom of the script with the other Helper Functions
+
+For each classified centroid, use the AddCoinToPlotAndCount function to draw a circle on the image display for each localized coin. Each coin type has a unique color and
+diameter approximately matching that of the coin.
+
+The function also outputs the value of the coin being plotted. Sum this result across all coins and store the result in totcount, which will be displayed in the final figure title.
